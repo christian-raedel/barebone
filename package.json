@@ -24,6 +24,8 @@
   "dependencies": {
     "autobahn": "^0.9.3",
     "debug": "^1.0.2",
-    "q": "^1.0.1"
+    "q": "^1.0.1",
+    "restify": "^2.8.1",
+    "taffydb": "^2.7.2"
   }
 }

@@ -5,7 +5,7 @@
         "type": "router",
         "realms": [
             {
-            "name": "demos",
+            "name": "tests",
             "roles": [
                 {
                 "name": "anonymous",
@@ -27,7 +27,7 @@
             "type": "web",
             "endpoint": {
                 "type": "tcp",
-                "port": 3000
+                "port": 8000
             },
             "paths": {
                 "/": {
@@ -40,26 +40,6 @@
             }
         }
         ]
-    },
-    {
-        "type": "guest",
-        "executable": "node",
-        "arguments": ["--debug-brk", "server.js"],
-        "options": {
-            "workdir": "..",
-            "stdin": {
-                "type": "json",
-                "value": {
-                    "url": "ws://127.0.0.1:3000/bb",
-                    "realm": "demos"
-                },
-                "close": true
-            },
-            "watch": {
-                "directories": [".."],
-                "action": "restart"
-            }
-        }
     }
     ]
 }
