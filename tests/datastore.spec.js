@@ -4,13 +4,9 @@ var expect = require('chai').expect
 describe('DataStore', function() {
     var ds = null;
 
-    before(function() {
-        ds = modules.DataStore({dataDir: __dirname + '/testdata'});
-    });
-
     it('should load testdata', function() {
         var testdata = require('./testdata/testcollection.json');
-        ds.load();
+        ds = modules.DataStore({datadir: __dirname + '/testdata'}).loadData();
         expect(ds.collections.testcollection).to.be.ok;
 
         var testrecord = ds.collections.testcollection().first();
@@ -21,7 +17,7 @@ describe('DataStore', function() {
 
     it('should save testdata', function(done) {
         ds.collections.testcollection.insert({name: "testrecord3", description: "the last test record..."});
-        ds.save()
+        ds.saveData()
         .then(function(saved) {
             expect(saved).to.be.true;
             done();

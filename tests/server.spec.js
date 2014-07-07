@@ -6,30 +6,41 @@ describe('Server', function() {
         var config = {
             url: 'ws://localhost:8000/bb',
             realm: 'tests',
-            uri: 'de.sonnenkarma.demos.barebone.tests',
-            curie: 'tbb',
+            domain: 'de.sonnenkarma.demos.barebone.tests',
+            curie: 'tbb'
         };
         expect(modules.Server.bind(modules, config)).to.throw(/plugins/);
     });
 
     it('should connect to application router and load plugins', function(done) {
+        this.timeout(0);
+
+        function catch_done(reason) {
+            done(new Error(reason));
+        }
+
+        modules.DataStore({datadir: __dirname + '/testdata'});
+
         var config = {
             url: 'ws://localhost:8000/bb',
             realm: 'tests',
-            uri: 'de.sonnenkarma.demos.barebone.tests',
+            domain: 'de.sonnenkarma.demos.barebone.tests',
             curie: 'tbb',
             plugins: __dirname + '/plugins'
         };
-        modules._cache.server = null;
         var server = modules.Server(config).connect().loadPlugins();
-        expect(server.session).to.be.ok;
-        setTimeout(function() {
+        server.session.then(function(session) {
+            expect(session).to.be.ok;
+            expect(Object.keys(session._prefixes)[0]).to.be.equal('tbb');
+
             var message = 'hello World!';
-            server.session.call(config.curie + ':hello-test', [message])
+            session.call(config.curie + ':hello-test', [message])
             .then(function(args) {
                 expect(args[0]).to.be.equal(message);
                 done();
-            }, done);
-        }, 1000);
+            })
+            .catch(catch_done);
+        })
+        .catch(catch_done);
     });
 });

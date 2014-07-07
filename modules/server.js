@@ -1,12 +1,13 @@
 var autobahn = require('autobahn')
     , q = require('q')
-    , fs = require('fs')
-    , modules = require('./index');
+    , fs = require('fs');
 
 module.exports = exports = Server;
 
 function Server(config) {
     this.setConf(config);
+
+    var defer = q.defer();
 
     var conn = new autobahn.Connection({
         url: config.url,
@@ -17,30 +18,26 @@ function Server(config) {
     conn.onopen = function(session) {
         console.log('connection to application router established');
         session.prefix(config.curie, config.domain);
-        this.session = session;
+        defer.resolve(session);
     };
     conn.onclose = function(reason, details) {
         console.log('connection to application router closed', reason, details);
-        this.session = null;
+        if (reason === 'unreachable') {
+            defer.reject(reason);
+        }
     };
 
     this.conn = conn;
+    this.session = defer.promise;
 }
 
 Server.prototype.connect = function() {
-    var self = this;
-    var timeout = setTimeout(function() {
-        if (self.session) {
-            clearTimeout(timeout);
-            return self;
-        } else {
-            return Server.prototype.connect.apply();
-        }
-    }, 500);
+    this.conn.open();
+    return this;
 };
 
 Server.prototype.setConf = function(config) {
-    ['url', 'realm', 'uri', 'curie', 'plugins'].forEach(function(key) {
+    ['url', 'realm', 'domain', 'curie', 'plugins'].forEach(function(key) {
         if (!config.hasOwnProperty(key) || !config[key]) {
             throw new Error('Please configure the "' + key + '" parameter.');
         }
@@ -56,8 +53,8 @@ Server.prototype.loadPlugins = function() {
     fs.readdirSync(dir).forEach(function(filename) {
         var module = require(dir + filename);
         Object.keys(module).forEach(function(fn) {
-            if (typeof fn === 'function') {
-                fn(session, config.curie, modules.DataStore());
+            if (typeof module[fn] === 'function') {
+                module[fn](session, config.curie);
             }
         });
     });
