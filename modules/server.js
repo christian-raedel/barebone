@@ -1,25 +1,27 @@
-var autobahn = require('autobahn')
+var _ = require('lodash')
+    , autobahn = require('autobahn')
     , q = require('q')
-    , fs = require('fs');
+    , fs = require('fs')
+    , Conf = require('./conf');
 
 module.exports = exports = Server;
 
 function Server(config) {
-    this.setConf(config);
-
-    var defer = q.defer();
+    var conf = new Conf('Server', ['url', 'realm', 'domain', 'curie', 'plugins']).load(config)
+        , defer = q.defer();
 
     var conn = new autobahn.Connection({
-        url: config.url,
-        realm: config.realm,
+        url: conf.get('url'),
+        realm: conf.get('realm'),
         use_deferred: q.defer
-    })
+    });
 
     conn.onopen = function(session) {
         console.log('connection to application router established');
-        session.prefix(config.curie, config.domain);
+        session.prefix(conf.get('curie'), conf.get('domain'));
         defer.resolve(session);
     };
+
     conn.onclose = function(reason, details) {
         console.log('connection to application router closed', reason, details);
         if (reason === 'unreachable') {
@@ -27,6 +29,7 @@ function Server(config) {
         }
     };
 
+    this.conf = conf;
     this.conn = conn;
     this.session = defer.promise;
 }
@@ -36,25 +39,20 @@ Server.prototype.connect = function() {
     return this;
 };
 
-Server.prototype.setConf = function(config) {
-    ['url', 'realm', 'domain', 'curie', 'plugins'].forEach(function(key) {
-        if (!config.hasOwnProperty(key) || !config[key]) {
-            throw new Error('Please configure the "' + key + '" parameter.');
-        }
-    });
-
-    this.conf = config;
-};
-
 Server.prototype.loadPlugins = function() {
     var session = this.session
-        , config = this.conf
-        , dir = config.plugins + '/';
-    fs.readdirSync(dir).forEach(function(filename) {
+        , conf = this.conf
+        , dir = conf.get('plugins') + '/';
+
+    if (!fs.existsSync(dir)) {
+        throw new Error('plugin directory "' + dir + '" does not exists!');
+    }
+
+    _.forEach(fs.readdirSync(dir), function(filename) {
         var module = require(dir + filename);
-        Object.keys(module).forEach(function(fn) {
-            if (typeof module[fn] === 'function') {
-                module[fn](session, config.curie);
+        _.forOwn(module, function(fn) {
+            if (typeof fn === 'function') {
+                fn(session, conf.get('curie'));
             }
         });
     });

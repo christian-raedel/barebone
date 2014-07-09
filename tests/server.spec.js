@@ -19,8 +19,6 @@ describe('Server', function() {
             done(new Error(reason));
         }
 
-        modules.DataStore({datadir: __dirname + '/testdata'});
-
         var config = {
             url: 'ws://localhost:8000/bb',
             realm: 'tests',
@@ -28,6 +26,7 @@ describe('Server', function() {
             curie: 'tbb',
             plugins: __dirname + '/plugins'
         };
+
         var server = modules.Server(config).connect().loadPlugins();
         server.session.then(function(session) {
             expect(session).to.be.ok;

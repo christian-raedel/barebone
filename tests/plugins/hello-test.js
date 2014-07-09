@@ -1,9 +1,4 @@
-var expect = require('chai').expect;
-
 module.exports.helloWorldTest = function(session, curie) {
-    var datastore = require('../../modules').DataStore();
-    expect(datastore).to.be.ok;
-
     function fn(args) {
         return [args[0]];
     }
