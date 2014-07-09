@@ -1,26 +1,72 @@
-var expect = require('chai').expect
+var _ = require('lodash')
+    , expect = require('chai').expect
+    , fs = require('fs')
     , modules = require('../modules');
 
 describe('DataStore', function() {
-    var ds = null;
+    var datastore = null
+        , testdata = null
+        , datadir = __dirname + '/testdata';
+
+    function rmdir(dir) {
+        if (fs.existsSync(dir)) {
+            _.forEach(fs.readdirSync(dir), function(item) {
+                item = dir + '/' + item
+                var stats = fs.statSync(item);
+                if (stats.isFile()) {
+                    fs.unlinkSync(item);
+                }
+
+                if (stats.isDirectory()) {
+                    rmdir(item);
+                }
+            });
+
+            return fs.rmdirSync(dir);
+        }
+
+        return false;
+    }
+
+    before(function() {
+        rmdir(datadir);
+        fs.mkdirSync(datadir);
+        testdata = {
+            name: 'testrecordA',
+            description: 'one testrecord...'
+        };
+        fs.writeFileSync(datadir + '/testcollection.json', JSON.stringify(testdata));
+    });
+
+    after(function() {
+        rmdir(datadir);
+    });
 
     it('should load testdata', function() {
-        var testdata = require('./testdata/testcollection.json');
-        ds = modules.DataStore({datadir: __dirname + '/testdata'}).loadData();
-        expect(ds.collections.testcollection).to.be.ok;
+        datastore = modules.DataStore({
+            datadir: datadir,
+            autoLoad: false
+        }).loadData();
+        expect(datastore.collections.testcollection).to.be.ok;
 
-        var testrecord = ds.collections.testcollection().first();
+        var testrecord = datastore.collections.testcollection().first();
         expect(testrecord['___id']).to.be.ok;
-        expect(testrecord.name).to.be.equal(testdata[0].name);
-        expect(testrecord.description).to.be.equal(testdata[0].description);
+        expect(testrecord.name).to.be.equal(testdata.name);
+        expect(testrecord.description).to.be.equal(testdata.description);
     });
 
     it('should save testdata', function(done) {
-        ds.collections.testcollection.insert({name: "testrecord3", description: "the last test record..."});
-        ds.saveData()
+        datastore.collections.testcollection.insert({
+            name: 'testrecordB',
+            description: 'one more test record...'
+        });
+        datastore.saveData()
         .then(function(saved) {
             expect(saved).to.be.true;
             done();
-        }, done);
+        })
+        .catch(function(reason) {
+            done(new Error(reason));
+        });
     });
 });

@@ -1,34 +1,28 @@
-var taffydb = require('taffydb').taffy
+var _ = require('lodash')
+    , taffydb = require('taffydb').taffy
     , q = require('q')
-    , fs = require('fs');
+    , fs = require('fs')
+    , Conf = require('./conf');
 
 module.exports = DataStore;
 
 function DataStore(config) {
-    this.setConf(config);
+    this.conf = new Conf('DataStore', ['datadir', 'autoLoad']).load(config);
 
     this.collections = {};
-    if (this.conf.autoLoad) {
+    if (this.conf.get('autoLoad')) {
         this.loadData();
     }
-};
 
-DataStore.prototype.setConf = function(config) {
-    ['datadir'].forEach(function(key) {
-        if (!config.hasOwnProperty(key) || !config[key]) {
-            throw new Error('Please configure the "' + key + '" parameter.');
-        }
-    });
-
-    this.conf = config;
+    return this;
 };
 
 DataStore.prototype.loadData = function() {
     var self = this
-        , config = this.conf;
+        , conf = this.conf;
 
-    fs.readdirSync(config.datadir).forEach(function(filename) {
-        var data = fs.readFileSync(config.datadir + '/' + filename, {encoding: 'utf8'});
+    _.forEach(fs.readdirSync(conf.get('datadir')), function(filename) {
+        var data = fs.readFileSync(conf.get('datadir') + '/' + filename, {encoding: 'utf8'});
         var name = filename.substring(0, filename.lastIndexOf('.'));
         self.collections[name] = taffydb(data);
     });
@@ -38,14 +32,14 @@ DataStore.prototype.loadData = function() {
 
 DataStore.prototype.saveData = function() {
     var self = this
-        , config = this.conf
+        , conf = this.conf
         , defer = q.defer()
         , writeFile = q.denodeify(fs.writeFile)
         , promises = [];
 
-    Object.keys(this.collections).forEach(function(name) {
-        var data = self.collections[name]().stringify();
-        promises.push(writeFile(config.datadir + '/' + name + '.json', data, {encoding: 'utf8', mode: 384}));
+    _.forOwn(this.collections, function(collection, name) {
+        var data = collection().stringify();
+        promises.push(writeFile(conf.get('datadir') + '/' + name + '.json', data, {encoding: 'utf8', mode: 384}));
     });
 
     q.all(promises)

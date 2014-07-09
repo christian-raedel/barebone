@@ -15,6 +15,8 @@ function Conf(name, keys) {
     if (_.isArray(keys)) {
         this.keys = keys;
     }
+
+    return this;
 }
 
 Conf.prototype.set = function(key, value) {
