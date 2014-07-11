@@ -1,22 +1,27 @@
-var debug = require('debug')('server:rest-server')
-    , restify = require('restify');
+var _ = require('lodash')
+    , restify = require('restify')
+    , Conf = require('../conf');
 
 module.exports = function RestServer(config) {
-    this.log = debug;
+    var conf = new Conf('RestServer', ['port', 'plugins'])
+    .defaults({port: 3000, plugins: __dirname + '/plugins'})
+    .load(config);
 
-    var self = this
-        , server = restify.createServer(config);
+    var server = restify.createServer(config);
+    var port = conf.get('port');
 
-    server.listen(config.port || 3000, function() {
-        self.log('listen on port [' + config.port + ']');
+    server.listen(port, function() {
+        console.log('RestServer listen on port [' + port + ']');
     });
 
     this.server = server;
-    return server;
+    this.conf = conf;
+
+    return this;
 };
 
-RestServer.prototype.loadApi = function(config) {
-    var self = this;
+RestServer.prototype.loadApi = function() {
+    var conf = this.conf;
 
     fs.readdirSync(config.apiDir).forEach(function(filename) {
         require(config.apiDir + '/' + filename).forEach(function(handler) {
