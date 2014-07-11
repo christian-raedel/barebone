@@ -1,5 +1,7 @@
 var _ = require('lodash')
-    , fs = require('fs');
+    , fs = require('fs')
+    , EventEmitter = require('events').EventEmitter
+    , util = require('util');
 
 module.exports = Conf;
 
@@ -8,7 +10,10 @@ function Conf(name, keys) {
         throw new Error('invalid arguments. provide a "name" to create a Conf instance!');
     }
 
+    EventEmitter.call(this);
+
     this.conf = {};
+    this.def = {};
     this.name = name;
     this.keys = [];
 
@@ -19,15 +24,27 @@ function Conf(name, keys) {
     return this;
 }
 
+util.inherits(Conf, EventEmitter);
+
 Conf.prototype.set = function(key, value) {
     if (arguments.length < 2 || !_.isString(key)) {
         throw new Error('provide a "key" and a "value" to set configuration in "' + this.name + '"!');
     }
 
+    var oldValue = this.conf[key];
     this.conf[key] = value;
+    this.emit('onValueChanged:' + key, {oldValue: oldValue, newValue: value});
+    this.emit('onValueChanged', {key: key, oldValue: oldValue, newValue: value});
 
     if (_.indexOf(this.keys, key) === -1) {
+        var keys = this.keys;
+
         this.keys.push(key);
+        this.emit('onKeysChanged', {
+            oldKeys: keys,
+            newKeys: this.keys,
+            changedKey: key
+        });
     }
 
     return this;
@@ -51,6 +68,10 @@ Conf.prototype.get = function(key) {
 
 Conf.prototype.load = function(source) {
     var conf = {};
+
+    if (_.isUndefined(source)) {
+        throw new Error('invalid source to load configuration "' + this.name + '"!');
+    }
 
     if (_.isArray(source) && source.length > 0) {
         _.forEach(source, function(keyValuePair) {
@@ -97,6 +118,10 @@ Conf.prototype.load = function(source) {
     }
 
     this.conf = this._validate(conf);
+    this.emit('onConfigLoaded', {
+        source: source,
+        config: this.conf
+    });
     return this;
 };
 
@@ -112,7 +137,9 @@ Conf.prototype.save = function(target) {
     }
 
     if (_.isObject(target)) {
-        return _.merge(target, conf);
+        target = _.merge(target, conf);
+        this.emit('onConfigSaved', {target: target});
+        return target;
     }
 
     try {
@@ -121,11 +148,29 @@ Conf.prototype.save = function(target) {
         throw new Error('cannot write configuration "' + this.name + '" to file "' + filename + '"!');
     }
 
+    this.emit('onConfigSaved', {target: filename});
     return true;
 };
 
+Conf.prototype.defaults = function(defaults, value) {
+    if (_.isUndefined(defaults)) {
+        throw new Error('invalid arguments to setting default values for configuration "' + this.name + '"!');
+    }
+
+    if (_.isPlainObject(defaults)) {
+        this.def = defaults;
+    }
+
+    if (_.isString(defaults) && !_.isUndefined(value)) {
+        this.def[defaults] = value;
+        this.addKeys(defaults);
+    }
+
+    return this;
+};
+
 Conf.prototype._validate = function(conf) {
-    if (arguments.length < 1) {
+    if (_.isUndefined(conf)) {
         conf = this.conf;
     }
 
@@ -135,9 +180,81 @@ Conf.prototype._validate = function(conf) {
 
     _.forEach(this.keys, function(key) {
         if (_.isUndefined(conf[key])) {
-            throw new Error('value of "' + key + '" in configuration "' + this.name + '" is undefined!');
+            if (_.isUndefined(this.def[key])) {
+                throw new Error('value of "' + key + '" in configuration "' + this.name + '" is undefined!');
+            }
+            conf[key] = this.def[key];
         }
     });
 
     return conf;
+};
+
+Conf.prototype.addKeys = function(args) {
+    if (_.isUndefined(args)) {
+        return this;
+    }
+
+    if (arguments.length > 1) {
+        args = _.toArray(arguments).slice();
+        args = _.flatten(args);
+    }
+
+    var keys = this.keys.slice();
+
+    if (_.isArray(args)) {
+        keys = _.union(keys, args);
+    }
+
+    if (_.isString(args) && _.indexOf(keys, args) === -1) {
+        keys.push(args);
+    }
+
+    if (_.difference(keys, this.keys).length > 0) {
+        keys = keys.sort();
+        this.emit('onKeysChanged', {
+            oldKeys: this.keys,
+            newKeys: keys,
+            changedKey: args
+        });
+        this.keys = keys;
+    }
+
+    return this;
+};
+
+Conf.prototype.removeKeys = function(args) {
+    if (_.isUndefined(args)) {
+        return this;
+    }
+
+    if (arguments.length > 1) {
+        args = _.toArray(arguments).slice();
+        args = _.flatten(args);
+    }
+
+    var keys = this.keys.slice();
+
+    if (_.isArray(args)) {
+        keys = _.difference(keys, args);
+    }
+
+    if (_.isString(args)) {
+        var idx = _.indexOf(keys, args);
+        if (idx > -1) {
+            keys.splice(idx, 1);
+        }
+    }
+
+    if (_.difference(this.keys, keys).length > 0) {
+        keys = keys.sort();
+        this.emit('onKeysChanged', {
+            oldKeys: this.keys,
+            newKeys: keys,
+            changedKey: args
+        });
+        this.keys = keys;
+    }
+
+    return this;
 };

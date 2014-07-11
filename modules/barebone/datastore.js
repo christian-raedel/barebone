@@ -2,7 +2,7 @@ var _ = require('lodash')
     , taffydb = require('taffydb').taffy
     , q = require('q')
     , fs = require('fs')
-    , Conf = require('./conf');
+    , Conf = require('../conf');
 
 module.exports = DataStore;
 

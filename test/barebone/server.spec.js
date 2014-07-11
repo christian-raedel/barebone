@@ -1,5 +1,5 @@
 var expect = require('chai').expect
-    , modules = require('../modules');
+    , modules = require('../../modules/barebone');
 
 describe('Server', function() {
     it('should throws an error on invalid configuration', function() {
@@ -13,7 +13,7 @@ describe('Server', function() {
     });
 
     it('should connect to application router and load plugins', function(done) {
-        this.timeout(0);
+        //this.timeout(0);
 
         function catch_done(reason) {
             done(new Error(reason));

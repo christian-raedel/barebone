@@ -2,7 +2,7 @@ var _ = require('lodash')
     , autobahn = require('autobahn')
     , q = require('q')
     , fs = require('fs')
-    , Conf = require('./conf');
+    , Conf = require('../conf');
 
 module.exports = exports = Server;
 

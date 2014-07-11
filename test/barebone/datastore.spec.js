@@ -1,7 +1,7 @@
 var _ = require('lodash')
     , expect = require('chai').expect
     , fs = require('fs')
-    , modules = require('../modules');
+    , modules = require('../../modules/barebone');
 
 describe('DataStore', function() {
     var datastore = null
