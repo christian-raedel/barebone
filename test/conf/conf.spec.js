@@ -53,6 +53,16 @@ describe('Conf', function() {
         expect(valueB).to.be.equal('valueB');
     });
 
+    it('should handles default values', function() {
+        var conf = new Conf('defaultConfig', ['paramA', 'paramB']).defaults({paramA: 'valueB'});
+        expect(conf).to.be.an.instanceof(Conf);
+        conf.defaults('paramB', 'valueB');
+        var expected = {paramA: 'valueB', paramB: 'valueB'};
+        expect(conf.def).to.be.deep.equal(expected);
+        conf.set('paramB');
+        expect(conf.conf).to.be.deep.equal(expected);
+    });
+
     it('should loads from a JSON source file', function() {
         var jsonObj = {keyA: 'valueB', keyB: 'valueA'}
             , filename = __dirname + '/testConfigFile.json';
@@ -108,7 +118,7 @@ describe('Conf', function() {
     });
 
     it('should emits on value changed', function() {
-        var conf = new Conf('eventsConfig', ['keyA', 'keyB']);
+        var conf = new Conf('eventsConfig', ['keyA', 'keyB']).defaults('keyA', 24);
 
         function onKeyBChanged(args) {
             expect(args, 'onKeyBChanged').to.be.ok;

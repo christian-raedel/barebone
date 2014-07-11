@@ -27,26 +27,19 @@ function Conf(name, keys) {
 util.inherits(Conf, EventEmitter);
 
 Conf.prototype.set = function(key, value) {
-    if (arguments.length < 2 || !_.isString(key)) {
+    if (!_.isString(key)) {
         throw new Error('provide a "key" and a "value" to set configuration in "' + this.name + '"!');
     }
 
-    var oldValue = this.conf[key];
+    this.emit('onValueChanged:' + key, {oldValue: this.conf[key], newValue: value});
+    this.emit('onValueChanged', {key: key, oldValue: this.conf[key], newValue: value});
     this.conf[key] = value;
-    this.emit('onValueChanged:' + key, {oldValue: oldValue, newValue: value});
-    this.emit('onValueChanged', {key: key, oldValue: oldValue, newValue: value});
 
     if (_.indexOf(this.keys, key) === -1) {
-        var keys = this.keys;
-
-        this.keys.push(key);
-        this.emit('onKeysChanged', {
-            oldKeys: keys,
-            newKeys: this.keys,
-            changedKey: key
-        });
+        this.addKeys(key);
     }
 
+    this._validate();
     return this;
 };
 
@@ -159,6 +152,7 @@ Conf.prototype.defaults = function(defaults, value) {
 
     if (_.isPlainObject(defaults)) {
         this.def = defaults;
+        this.addKeys.apply(this, Object.keys(defaults));
     }
 
     if (_.isString(defaults) && !_.isUndefined(value)) {
@@ -185,7 +179,7 @@ Conf.prototype._validate = function(conf) {
             }
             conf[key] = this.def[key];
         }
-    });
+    }, this);
 
     return conf;
 };
