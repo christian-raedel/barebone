@@ -8,6 +8,7 @@ describe('FsActions', function() {
         fs = new FsActions({debug: true});
         expect(fs).to.be.an.instanceof(FsActions);
         expect(fs.config().get('fsDelimiter')).to.be.equal('/');
+        expect(fs.config().get('debug')).to.be.equal(true);
     });
 
     it('should creates a new directory', function(done) {

@@ -177,6 +177,8 @@ Conf.prototype._validate = function(conf) {
             if (_.isUndefined(this.def[key])) {
                 throw new Error('value of "' + key + '" in configuration "' + this.name + '" is undefined!');
             }
+            this.emit('onValueChanged:' + key, {oldValue: conf[key], newValue: this.def[key]});
+            this.emit('onValueChanged', {key: key, oldValue: conf[key], newValue: this.def[key]});
             conf[key] = this.def[key];
         }
     }, this);

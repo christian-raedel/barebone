@@ -12,31 +12,27 @@ function FsActions(config) {
 }
 
 FsActions.prototype.config = function(config) {
+    var def = {debug: false, fsDelimiter: '/'};
+
     if (!config) {
         if (this.conf instanceof Conf) {
             return this.conf;
         }
 
-        config = {debug: false, fsDelimiter: '/'};
+        config = def;
     }
 
-    this.conf = new Conf('FsActions', ['debug', 'fsDelimiter']);
+    var conf = new Conf('FsActions', ['debug', 'fsDelimiter']).defaults(def);
 
-    this.conf.on('onValueChanged:debug', function(args) {
+    conf.on('onValueChanged:debug', function(args) {
         q.longStackSupport = args.newValue;
+        console.log('Q\'s longStackSupport is ' + (q.longStackSupport ? 'enabled' : 'disabled'));
     });
 
-    this.conf.load(config);
+    conf.load(config);
+    this.conf = conf;
 
-    if (_.isUndefined(this.conf.get('debug'))) {
-        this.conf.set('debug', false);
-    }
-
-    if (_.isUndefined(this.conf.get('fsDelimiter'))) {
-        this.conf.set('fsDelimiter', '/');
-    }
-
-    return this.conf;
+    return conf;
 };
 
 FsActions.prototype.mkdir = function(dir) {
@@ -44,20 +40,21 @@ FsActions.prototype.mkdir = function(dir) {
         , stat = q.denodeify(fs.stat)
         , mkdir = q.denodeify(fs.mkdir);
 
-    if (arguments.length < 1 || !_.isString(dir)) {
-        defer.resolve('invalid directory argument "' + dir + '"!');
+    if (!_.isString(dir)) {
+        throw new Error('invalid directory argument "' + dir + '"!');
     }
 
-    while (dir[dir.length - 1] === '/') {
+    var del = this.conf.get('fsDelimiter');
+    while (dir[dir.length - 1] === del) {
         dir = dir.substr(0, dir.length - 2);
     }
 
     console.log('trying to create directory "' + dir + '"...');
-    var dirs = dir.split('/')
+    var dirs = dir.split(del)
         , chain = q.fcall(function() {});
     _.forEach(dirs, function(dir, idx, dirs) {
         if (idx > 0) {
-            dir = dirs.slice(0, idx + 1).join('/');
+            dir = dirs.slice(0, idx + 1).join(del);
             console.log(dir);
 
             function link() {

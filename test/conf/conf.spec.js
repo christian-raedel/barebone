@@ -130,14 +130,14 @@ describe('Conf', function() {
 
         function onValueChanged(args) {
             expect(args).to.be.ok;
-            expect(args.key).to.be.equal('keyB');
+            expect(args.key).to.be.ok;
         }
         var spyB = chai.spy(onValueChanged);
         conf.on('onValueChanged', spyB);
 
         conf.set('keyB', 43);
-        expect(spyA).to.have.been.called.once();
-        expect(spyB).to.have.been.called.once();
+        expect(spyA).to.have.been.called;
+        expect(spyB).to.have.been.called;
     });
 
     it('should emits on loading and saving', function() {
