@@ -1,8 +1,11 @@
 var _ = require('lodash')
     , restify = require('restify')
+    , FsActions = require('../fs-actions')
     , Conf = require('../conf');
 
-module.exports = function RestServer(config) {
+module.exports = RestServer;
+
+function RestServer(config) {
     var conf = new Conf('RestServer', ['port', 'plugins'])
     .defaults({port: 3000, plugins: __dirname + '/plugins'})
     .load(config);
@@ -18,17 +21,22 @@ module.exports = function RestServer(config) {
     this.conf = conf;
 
     return this;
-};
+}
 
 RestServer.prototype.loadApi = function() {
-    var conf = this.conf;
+    var conf = this.conf
+        , fsActions = new FsActions();
 
-    fs.readdirSync(config.apiDir).forEach(function(filename) {
-        require(config.apiDir + '/' + filename).forEach(function(handler) {
-            self.server = handler(self.server);
-        });
-        self.log('plugin: [' + filename + '] loaded');
-    });
+    fsActions.readDirAndExecuteSync(conf.get('plugins'), new RegExp('.*\.js$'), function(filename) {
+        _.forEach(require(filename), function(handler) {
+            if (!(this.server instanceof RestServer)) {
+                throw new Error('invalid RestServer argument "' + this + '" for "' + filename + '"!');
+            }
+
+            this.server = handler(this.server);
+            console.log('plugin "' + filename + '" loaded');
+        }, this);
+    }, this);
 
     return this.server;
 };

@@ -185,6 +185,6 @@
         grunt.registerTask('postTest', ['copy:source', 'copy:general', 'notify']);
         grunt.registerTask('test', ['preTest', 'karma', 'postTest', 'watch:test']);
         grunt.registerTask('default', ['preTest', 'postTest', 'watch:default']);
-        grunt.registerTask('node', ['mochaTest', 'watch:node']);
+        grunt.registerTask('node', ['mochaTest:node', 'watch:node']);
     };
 }());

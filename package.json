@@ -1,6 +1,9 @@
 {
   "name": "barebone",
   "version": "0.0.1",
+  "scripts": {
+      "test": "grunt mochaTest:node"
+  },
   "devDependencies": {
     "chai": "^1.9.1",
     "chai-spies": "^0.5.1",

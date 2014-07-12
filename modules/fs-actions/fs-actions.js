@@ -219,9 +219,7 @@ FsActions.prototype.removeDirSync = function(dir) {
     return this;
 };
 
-FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn) {
-    var args = _.toArray(arguments);
-
+FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn, context) {
     if (!_.isString(dir)) {
         throw new Error('invalid arguments to reading directory!');
     }
@@ -229,7 +227,6 @@ FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn) {
     if (_.isFunction(filter)) {
         fn = filter;
         filter = '.*';
-        args = args.slice(2);
     }
 
     if (!_.isRegExp(filter)) {
@@ -257,7 +254,7 @@ FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn) {
 
             if (stats.isFile()) {
                 _.forEach(fn, function(fn) {
-                    fn.apply(null, _.flatten([filename, args]));
+                    fn.apply(context, [filename]);
                 });
             };
         }
