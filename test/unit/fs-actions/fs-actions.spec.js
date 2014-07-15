@@ -7,7 +7,7 @@ var expect = chai.expect
     , _ = require('lodash')
     , q = require('q')
     , fs = require('fs')
-    , FsActions = require('../../modules/fs-actions');
+    , FsActions = require('../../../modules/fs-actions');
 
 describe('FsActions', function() {
     var fsActions = null;

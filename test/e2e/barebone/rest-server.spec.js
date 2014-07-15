@@ -1,5 +1,5 @@
 var expect = require('chai').expect
-    , RestServer = require('../../modules/barebone/rest-server');
+    , RestServer = require('../../../modules/barebone/rest-server');
 
 describe('RestServer', function() {
     var restServer = null;

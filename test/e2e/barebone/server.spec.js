@@ -1,5 +1,5 @@
 var expect = require('chai').expect
-    , modules = require('../../modules/barebone');
+    , modules = require('../../../modules/barebone');
 
 describe('Server', function() {
     it('should throws an error on invalid configuration', function() {

@@ -1,4 +1,5 @@
 var _ = require('lodash')
+    , eyesOn = require('eyes').inspector({styles: {all: 'magenta'}})
     , q = require('q')
     , async = require('async')
     , fs = require('fs')
@@ -39,15 +40,7 @@ FsActions.prototype.createDir = function(dir) {
         , del = this.conf.get('fsDelimiter');
 
     function create(dir, cb) {
-        if (dir[dir.length - 1] !== del) {
-            dir += del;
-        }
-
-        fs.exists(dir, function(err, exists) {
-            if (err) {
-                return cb(err);
-            }
-
+        fs.exists(dir, function(exists) {
             if (exists) {
                 return cb(null);
             }
@@ -66,13 +59,13 @@ FsActions.prototype.createDir = function(dir) {
         dir = [dir];
     }
 
+    var self = this;
     async.each(dir, function(dir, cb) {
-        var dirs = _(dir).map(dir.split(del), function(dir, idx, dirs) {
-            return dirs.slice(0, idx).join(del);
-        })
-        .filter(dirs, function(dir) {
-            return dir.length === 0 ? false : true;
-        });
+        if (dir[dir.length - 1] !== del) {
+            dir += del;
+        }
+
+        var dirs = self._makePathsArray(dir);
 
         async.each(dirs, create, function(err) {
             if (err) {
@@ -97,15 +90,7 @@ FsActions.prototype.removeDir = function(dir) {
         , del = this.conf.get('fsDelimiter');
 
     function remove(dir, cb) {
-        if (dir[dir.length - 1] !== del) {
-            dir += del;
-        }
-
-        fs.exists(dir, function(err, exists) {
-            if (err) {
-                return cb(err);
-            }
-
+        fs.exists(dir, function(exists) {
             if (!exists) {
                 return cb(new Error('directory "' + dir + '" does not exists!'));
             }
@@ -124,14 +109,13 @@ FsActions.prototype.removeDir = function(dir) {
         dir = [dir];
     }
 
+    var self = this;
     async.each(dir, function(dir, cb) {
-        var dirs = _(dir).map(dir.split(del), function(dir, idx, dirs) {
-            return dirs.slice(0, idx).join(del);
-        })
-        .filter(dirs, function(dir) {
-            return dir.length === 0 ? false : true;
-        })
-        .reverse();
+        if (dir[dir.length - 1] !== del) {
+            dir += del;
+        }
+
+        var dirs = self._makePathsArray(dir).reverse();
 
         async.each(dirs, remove, function(err) {
             if (err) {
@@ -167,20 +151,14 @@ FsActions.prototype.createDirSync = function(dir) {
             dir += del;
         }
 
-        var parts = _(dir).map(dir.split(del), function(dir, idx, dirs) {
-            return dirs.slice(0, idx).join(del);
-        })
-        .filter(parts, function(dir) {
-            return dir.length === 0 ? false : true;
-        })
-        .value();
+        var parts = this._makePathsArray(dir);
 
         _.forEach(parts, function(part) {
             if (!fs.existsSync(part)) {
                 fs.mkdirSync(part);
             }
         });
-    });
+    }, this);
 
     return this;
 };
@@ -201,20 +179,14 @@ FsActions.prototype.removeDirSync = function(dir) {
             dir += del;
         }
 
-        var parts = _(dir).map(dir.split(del), function(dir, idx, dirs) {
-            return dirs.slice(0, idx).join(del);
-        })
-        .filter(parts, function(dir) {
-            return dir.length === 0 ? false : true;
-        })
-        .reverse().value();
+        var parts = this._makePathsArray(dir).reverse();
 
         _.forEach(parts, function(part) {
             if (fs.existsSync(part)) {
                 fs.rmdirSync(part);
             }
         });
-    });
+    }, this);
 
     return this;
 };
@@ -261,4 +233,16 @@ FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn, context) {
     });
 
     return this;
+};
+
+FsActions.prototype._makePathsArray = function(dir) {
+    var del = this.conf.get('fsDelimiter');
+
+    return _(dir.split(del)).map(function(dir, idx, dirs) {
+        return dirs.slice(0, idx).join(del);
+    })
+    .filter(function(dir) {
+        return dir.length === 0 ? false : true;
+    })
+    .value();
 };

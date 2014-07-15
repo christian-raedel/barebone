@@ -5,7 +5,7 @@ chai.use(spies);
 
 var expect = chai.expect
     , fs = require('fs')
-    , Conf = require('../../modules/conf');
+    , Conf = require('../../../modules/conf');
 
 describe('Conf', function() {
     it('should requires module', function() {

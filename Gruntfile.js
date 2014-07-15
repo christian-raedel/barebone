@@ -61,8 +61,15 @@
                 }
             },
             mochaTest: {
-                node: {
-                    src: ['test/**/*.js'],
+                unit: {
+                    src: ['test/unit/**/*.spec.js'],
+                    options: {
+                        reporter: 'spec',
+                        clearRequireCache: true
+                    }
+                },
+                e2e: {
+                    src: ['test/e2e/**/*.spec.js'],
                     options: {
                         reporter: 'spec',
                         growl: true,
@@ -145,7 +152,7 @@
                         spawn: false,
                     }
                 },
-                test: {
+                client: {
                     files: ['Gruntfile.js', 'index.html', 'app/**/*'],
                     tasks: ['test'],
                     options: {
@@ -173,11 +180,19 @@
             grunt.loadNpmTasks(task);
         });
 
-        var nodeTestSrc = grunt.config('mochaTest.node.src');
+        var nodeUnitTestSrc = grunt.config('mochaTest.unit.src');
         grunt.event.on('watch', function(action, filepath) {
-            grunt.config('mochaTest.node.src', nodeTestSrc);
+            grunt.config('mochaTest.unit.src', nodeUnitTestSrc);
             if (filepath.match('test/')) {
-                grunt.config('mochaTest.node.src', filepath);
+                grunt.config('mochaTest.unit.src', filepath);
+            }
+        });
+
+        var nodeE2ETestSrc = grunt.config('mochaTest.e2e.src');
+        grunt.event.on('watch', function(action, filepath) {
+            grunt.config('mochaTest.e2e.src', nodeE2ETestSrc);
+            if (filepath.match('test/')) {
+                grunt.config('mochaTest.e2e.src', filepath);
             }
         });
 
@@ -185,6 +200,7 @@
         grunt.registerTask('postTest', ['copy:source', 'copy:general', 'notify']);
         grunt.registerTask('test', ['preTest', 'karma', 'postTest', 'watch:test']);
         grunt.registerTask('default', ['preTest', 'postTest', 'watch:default']);
-        grunt.registerTask('node', ['mochaTest:node', 'watch:node']);
+        grunt.registerTask('node', ['mochaTest', 'watch:node']);
+        grunt.registerTask('travis', ['mochaTest:unit']);
     };
 }());
