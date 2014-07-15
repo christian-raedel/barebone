@@ -23,7 +23,7 @@ describe('FsActions', function() {
 
     it('should creates a new directory', function() {
         var dir = __dirname + '/tests/1/2/3';
-        fsActions.createDirSync(dir);
+        fsActions.createDir(dir);
         expect(fs.existsSync(dir)).to.be.true;
     });
 
@@ -32,25 +32,13 @@ describe('FsActions', function() {
             __dirname + '/tests/2/3/4',
             __dirname + '/tests/2/4/5'
         ];
-        fsActions.createDirSync(dirs);
+        fsActions.createDir(dirs);
         _.forEach(function(dir) {
             expect(fs.existsSync(dir)).to.be.true;
         });
     });
 
-    it('should creates a new directory async', function(done) {
-        var dir = __dirname + '/tests/3/4/5';
-        fsActions.createDir(dir)
-        .then(function(created) {
-            expect(created).to.be.true;
-            done();
-        })
-        .catch(function(reason) {
-            done(new Error(reason));
-        });
-    });
-
-    it('should reads and executes a directory sync', function() {
+    it('should reads and executes a directory', function() {
         var dir = __dirname + '/tests'
             , s = 'helloWorld!';
 
@@ -61,45 +49,10 @@ describe('FsActions', function() {
         }, s);
     });
 
-    it('should removes a directory async', function(done) {
-        var dir = __dirname + '/tests/3/4/5';
-        fsActions.removeDir(dir)
-        .then(function(removed) {
-            expect(removed).to.be.true;
-            done();
-        })
-        .catch(function(reason) {
-            done(new Error(reason));
-        });
-    });
+    it('should removes a directory', function() {
+        var dir = __dirname + '/tests';
 
-    it('should creates multiple new directories async', function(done) {
-        var dirs = [
-            __dirname + '/tests/4/5/6',
-            __dirname + '/tests/4/6/7'
-        ];
-        fsActions.createDir(dirs)
-        .then(function(created) {
-            expect(created).to.be.true;
-            done();
-        })
-        .catch(function(reason) {
-            done(new Error(reason));
-        });
-    });
-
-    it('should removes multiple directories async', function(done) {
-        var dirs = [
-            __dirname + '/tests/4/5/6',
-            __dirname + '/tests/4/6/7'
-        ];
-        fsActions.removeDir(dirs)
-        .then(function(removed) {
-            expect(removed).to.be.true;
-            done();
-        })
-        .catch(function(reason) {
-            done(new Error(reason));
-        });
+        fsActions.removeDir(dir);
+        expect(fs.existsSync(dir)).to.be.false;
     });
 });

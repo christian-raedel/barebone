@@ -36,106 +36,6 @@ FsActions.prototype.config = function(config) {
 };
 
 FsActions.prototype.createDir = function(dir) {
-    var defer = q.defer()
-        , del = this.conf.get('fsDelimiter');
-
-    function create(dir, cb) {
-        fs.exists(dir, function(exists) {
-            if (exists) {
-                return cb(null);
-            }
-
-            fs.mkdir(dir, function(err) {
-                if (err) {
-                    return cb(err);
-                }
-
-                return cb(null);
-            });
-        });
-    }
-
-    if (_.isString(dir)) {
-        dir = [dir];
-    }
-
-    var self = this;
-    async.each(dir, function(dir, cb) {
-        if (dir[dir.length - 1] !== del) {
-            dir += del;
-        }
-
-        var dirs = self._makePathsArray(dir);
-
-        async.each(dirs, create, function(err) {
-            if (err) {
-                return cb(err);
-            }
-
-            return cb(null);
-        });
-    }, function(err) {
-        if (err) {
-            defer.reject(err);
-        }
-
-        defer.resolve(true);
-    });
-
-    return defer.promise;
-};
-
-FsActions.prototype.removeDir = function(dir) {
-    var defer = q.defer()
-        , del = this.conf.get('fsDelimiter');
-
-    function remove(dir, cb) {
-        fs.exists(dir, function(exists) {
-            if (!exists) {
-                return cb(new Error('directory "' + dir + '" does not exists!'));
-            }
-
-            fs.rmdir(dir, function(err) {
-                if (err) {
-                    return cb(err);
-                }
-
-                return cb(null);
-            });
-        });
-    }
-
-    if (_.isString(dir)) {
-        dir = [dir];
-    }
-
-    var self = this;
-    async.each(dir, function(dir, cb) {
-        if (dir[dir.length - 1] !== del) {
-            dir += del;
-        }
-
-        var dirs = self._makePathsArray(dir).reverse();
-
-        async.each(dirs, remove, function(err) {
-            if (err) {
-                return cb(err);
-            }
-
-            return cb(null);
-        });
-    }, function(err) {
-        if (err) {
-            defer.reject(err);
-        }
-
-        defer.resolve(true);
-    });
-
-    return defer.promise;
-};
-
-FsActions.prototype.createDirSync = function(dir) {
     if (!dir) {
         throw new Error('invalid arguments to creating directories!');
     }
@@ -163,7 +63,7 @@ FsActions.prototype.createDirSync = function(dir) {
     return this;
 };
 
-FsActions.prototype.removeDirSync = function(dir) {
+FsActions.prototype.removeDir = function(dir) {
     if (!dir) {
         throw new Error('invalid arguments to creating directories!');
     }
@@ -179,13 +79,19 @@ FsActions.prototype.removeDirSync = function(dir) {
             dir += del;
         }
 
-        var parts = this._makePathsArray(dir).reverse();
+        if (fs.existsSync(dir)) {
+            _.forEach(fs.readdirSync(dir), function(filename) {
+                filename = dir + del + filename;
+                var stats = fs.statSync(filename);
+                if (stats.isDirectory()) {
+                    this.removeDir(filename);
+                } else {
+                    fs.unlinkSync(filename);
+                }
+            }, this);
 
-        _.forEach(parts, function(part) {
-            if (fs.existsSync(part)) {
-                fs.rmdirSync(part);
-            }
-        });
+            fs.rmdirSync(dir);
+        }
     }, this);
 
     return this;
