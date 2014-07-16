@@ -1,8 +1,10 @@
 var expect = require('chai').expect
     , restify = require('restify')
-    , RestServer = require('../../../modules/barebone/rest-server');
+    , RestServer = require('../../../../modules/barebone/rest-server');
 
-module.exports.serverUses = function(server) {
+module.exports.serverUses = function() {
+    var server = this.server;
+
     server.use(restify.authorizationParser);
-    expect(server).to.be.an.instanceof(RestServer);
+    expect(this).to.be.an.instanceof(RestServer);
 };

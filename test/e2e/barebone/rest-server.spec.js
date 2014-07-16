@@ -1,12 +1,8 @@
 var expect = require('chai').expect
-    , RestServer = require('../../../modules/barebone/rest-server');
+    , RestServer = require('../../../modules/barebone').RestServer;
 
 describe('RestServer', function() {
     var restServer = null;
-
-    after(function() {
-        restServer.close();
-    });
 
     it('should instantiates a new RestServer', function() {
         try {
@@ -21,5 +17,17 @@ describe('RestServer', function() {
     it('should load server plugins', function() {
         restServer.conf.set('plugins', __dirname + '/api');
         restServer.loadApi();
+    });
+
+    it('should shutdown the server within a given time', function(done) {
+        this.timeout(10000);
+
+        restServer.shutdown(2000).then(function(down) {
+            expect(down).to.be.true;
+            done();
+        })
+        .catch(function(reason) {
+            done(reason);
+        });
     });
 });
