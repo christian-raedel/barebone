@@ -2,7 +2,7 @@
   "name": "barebone",
   "version": "0.0.1",
   "scripts": {
-    "test": "./node-modules/.bin/grunt mochaTest:node"
+    "test": "./node-modules/.bin/grunt travis"
   },
   "devDependencies": {
     "chai": "^1.9.1",
