@@ -1,8 +1,6 @@
 var _ = require('lodash')
-    , eyesOn = require('eyes').inspector({styles: {all: 'magenta'}})
-    , q = require('q')
-    , async = require('async')
     , fs = require('fs')
+    , path = require('path')
     , Conf = require('../conf');
 
 module.exports = FsActions;
@@ -14,7 +12,7 @@ function FsActions(config) {
 }
 
 FsActions.prototype.config = function(config) {
-    var def = {debug: false, fsDelimiter: '/'};
+    var def = {debug: false, fsDelimiter: path.sep};
 
     if (!config) {
         if (this.conf instanceof Conf) {
@@ -25,11 +23,6 @@ FsActions.prototype.config = function(config) {
     }
 
     var conf = new Conf('FsActions', ['debug', 'fsDelimiter']).defaults(def);
-
-    conf.on('onValueChanged:debug', function(args) {
-        q.longStackSupport = args.newValue;
-        console.log('Q\'s longStackSupport is ' + (q.longStackSupport ? 'enabled' : 'disabled'));
-    });
 
     this.conf = conf.load(config);
     return conf;

@@ -5,7 +5,6 @@ chai.use(spies);
 
 var expect = chai.expect
     , _ = require('lodash')
-    , q = require('q')
     , fs = require('fs')
     , FsActions = require('../../../modules/fs-actions');
 
@@ -13,12 +12,10 @@ describe('FsActions', function() {
     var fsActions = null;
 
     it('should creates a new instance', function() {
-        fsActions = new FsActions({debug: true});
+        fsActions = new FsActions();
         expect(fsActions).to.be.an.instanceof(FsActions);
         expect(fsActions.config().get('fsDelimiter')).to.be.equal('/');
-        expect(fsActions.config().get('debug')).to.be.equal(true);
-        fsActions.config().set('debug', true);
-        expect(q.longStackSupport).to.be.true;
+        expect(fsActions.config().get('debug')).to.be.equal(false);
     });
 
     it('should creates a new directory', function() {
