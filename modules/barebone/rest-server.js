@@ -64,17 +64,19 @@ RestServer.prototype.loadApi = function() {
 };
 
 RestServer.prototype.shutdown = function(timeout) {
-    var defer = q.defer()
-        , server = this.server;
+    var server = this.server;
 
-    server.on('close', function() {
-        defer.resolve(true);
+    var close = q.fcall(function() {
+        var defer = q.defer();
+
+        server.on('close', function() {
+            console.log('RestServer shutdown');
+            defer.resolve(true);
+        });
+        server.close();
+
+        return defer.promise;
     });
-    server.close();
 
-    setTimeout(function() {
-        defer.reject(new Error('could not shutdown RestServer within the given time!'));
-    }, timeout);
-
-    return defer.promise;
+    return q.timeout(close, timeout, 'RestServer shutdown time expired!');
 };

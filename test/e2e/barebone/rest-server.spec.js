@@ -15,7 +15,7 @@ describe('RestServer', function() {
     });
 
     it('should load server plugins', function() {
-        restServer.conf.set('plugins', __dirname + '/api');
+        restServer.conf.set('plugins', __dirname + '/rest-api');
         restServer.loadApi();
     });
 

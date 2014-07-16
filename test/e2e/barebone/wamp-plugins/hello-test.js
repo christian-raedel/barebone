@@ -1,4 +1,7 @@
-module.exports.helloWorldTest = function(session, curie) {
+module.exports.helloWorldTest = function() {
+    var session = this.session
+        , curie = this.conf.get('curie');
+
     function fn(args) {
         return [args[0]];
     }
