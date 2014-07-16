@@ -97,11 +97,7 @@ FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn, context) {
 
     if (_.isFunction(filter)) {
         fn = filter;
-        filter = '.*';
-    }
-
-    if (!_.isRegExp(filter)) {
-        filter = new RegExp(filter, 'gi');
+        filter = new RegExp('.*', 'gi');
     }
 
     if (!_.isFunction(fn) && !_.isArray(fn)) {
@@ -119,7 +115,8 @@ FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn, context) {
     }
 
     _.forEach(fs.readdirSync(dir), function(filename) {
-        if (filename.match(filter)) {
+        if ((_.isString(filter) && path.extname(filename) === filter) ||
+            (_.isRegExp(filter) && filename.match(filter))) {
             filename = dir + del + filename;
             var stats = fs.statSync(filename);
 

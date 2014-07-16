@@ -3,5 +3,5 @@
     "realm": "demos",
     "uri": "de.sonnenkarma.demos.barebone",
     "curie": "bb",
-    "plugins": "modules/plugins"
+    "plugins": "modules/barebone/plugins"
 }
