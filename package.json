@@ -1,8 +1,8 @@
 {
   "name": "barebone",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
-    "test": "./node-modules/.bin/grunt travis"
+    "test": "./node_modules/grunt-cli/bin/grunt travis"
   },
   "devDependencies": {
     "chai": "^1.9.1",

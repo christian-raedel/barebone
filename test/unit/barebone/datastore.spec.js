@@ -1,7 +1,7 @@
 var _ = require('lodash')
     , expect = require('chai').expect
     , fs = require('fs')
-    , modules = require('../../../modules/barebone');
+    , DataStore = require('../../../modules/barebone').DataStore;
 
 describe('DataStore', function() {
     var datastore = null
@@ -43,7 +43,7 @@ describe('DataStore', function() {
     });
 
     it('should load testdata', function() {
-        datastore = modules.DataStore({
+        datastore = new DataStore({
             datadir: datadir,
             autoLoad: false
         }).loadData();
