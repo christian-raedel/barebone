@@ -17,7 +17,7 @@ describe('Logger', function() {
         this.timeout(5000);
 
         var filename = __dirname + '/test.log';
-        logger.use(logger.fileTransport({
+        logger.use(logger.transports.file({
             logfile: filename,
             autoClose: 0
         }));
@@ -28,5 +28,17 @@ describe('Logger', function() {
             fs.unlinkSync(filename);
             done();
         }, 2000);
+    });
+
+    it('should handles custom transport', function() {
+        logger.transports = [];
+
+        function customTransport(obj) {
+            expect(obj.level).to.be.equal('error');
+            expect(obj.message).to.be.equal('dlc');
+        }
+
+        logger.use(customTransport);
+        logger.error('%sl%s', 'd', 'c');
     });
 });
