@@ -110,6 +110,11 @@ Conf.prototype.load = function(source) {
         }
     }
 
+    _.forOwn(conf, function(value, key) {
+        this.emit('onValueChanged:' + key, {oldValue: null, newValue: value});
+        this.emit('onValueChanged', {key: key, oldValue: null, newValue: value});
+    }, this);
+
     this.conf = this._validate(conf);
     this.emit('onConfigLoaded', {
         source: source,
