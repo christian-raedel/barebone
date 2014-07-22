@@ -75,7 +75,8 @@ WampServer.prototype.connect = function() {
 };
 
 WampServer.prototype.shutdown = function(timeout) {
-    var conn = this.conn;
+    var self = this
+        , conn = this.conn;
 
     var close = q.fcall(function() {
         var defer = q.defer();
@@ -87,7 +88,7 @@ WampServer.prototype.shutdown = function(timeout) {
         };
         */
         conn.close();
-        this.logger.info('WampServer shutdown');
+        self.logger.warn('WampServer shutdown');
         defer.resolve(true);
 
         return defer.promise;

@@ -3,23 +3,25 @@ var _ = require('lodash')
     , path = require('path')
     , q = require('q')
     , FsActions = require('../fs-actions')
-    , Logger = require('../logger')
+    , logging = require('../logger')
     , Conf = require('../conf');
 
 module.exports = RestServer;
 
 function RestServer(config) {
     var conf = this.config(config);
+    var logger = new logging.Logger({name: 'REST'}).use(logging.Transports.console());
 
     var server = restify.createServer();
     var port = conf.get('port');
 
     server.listen(port, function() {
-        console.log('RestServer listen on port [%d]', port);
+        logger.info('server listen on port [%d]', port);
     });
 
     this.server = server;
     this.conf = conf;
+    this.logger = logger;
 
     return this;
 }
@@ -28,8 +30,7 @@ RestServer.prototype.config = function(config) {
     var def = {
         port: 3000,
         plugins: __dirname + '/plugins',
-        basePath: '/api/',
-        logfile: '/../../logs/rest-server.log'
+        basePath: '/api/'
     };
 
     if (!config) {
@@ -43,18 +44,11 @@ RestServer.prototype.config = function(config) {
     var conf = new Conf('RestServer', [
         'port',
         'plugins',
-        'basePath',
-        'logfile'
+        'basePath'
     ])
     .defaults(def);
 
     this.conf = conf.load(config);
-
-    var logger = new Logger();
-    logger.use(logger.transports.file(conf.get('logfile')));
-    logger.use(logger.transports.console());
-    this.logger = logger;
-
     return conf;
 };
 
@@ -64,7 +58,7 @@ RestServer.prototype.loadApi = function() {
 
     fsActions.readDirAndExecuteSync(conf.get('plugins'), new RegExp('.*\.js$'), function(filename) {
         _.forEach(require(filename), function(handler) {
-            console.log('RestServer loading plugin [%s]', path.basename(filename, '.js'));
+            this.logger.info('server is loading plugin [%s]', path.basename(filename, '.js'));
             handler.apply(this);
         }, this);
     }, this);
@@ -73,13 +67,14 @@ RestServer.prototype.loadApi = function() {
 };
 
 RestServer.prototype.shutdown = function(timeout) {
-    var server = this.server;
+    var self = this
+        , server = this.server;
 
     var close = q.fcall(function() {
         var defer = q.defer();
 
         server.on('close', function() {
-            console.log('RestServer shutdown');
+            self.logger.warn('RestServer shutdown');
             defer.resolve(true);
         });
         server.close();

@@ -6,10 +6,10 @@ module.exports.echoService = function() {
     session.then(function(session) {
         session.register(curie + ':echo', function(args) { return args; })
         .then(function(registration) {
-            logger.info('[%s] registered successfully', registration.procedure);
+            logger.info('\t[%s] registered successfully', registration.procedure);
         })
         .catch(function(reason) {
-            logger.error(reason);
+            logger.error('\t%s', reason);
         });
     });
 };

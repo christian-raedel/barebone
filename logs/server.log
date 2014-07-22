@@ -3,3 +3,87 @@ Logger:fileTransport stream opened...
 [Tue Jul 22 2014 13:30:54 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
 [Tue Jul 22 2014 13:30:54 GMT+0200 (CEST)] [WAMPSERVER] INFO - [bb:echo] registered successfully
 Logger:fileTransport stream closed...
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:01:50 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:14:16 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:14:40 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:14:40 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:14:40 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:14:40 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:14:40 GMT+0200 (CEST)] [WAMPSERVER] ERROR - 	wamp.error.procedure_already_exists
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:14:52 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:15:42 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:15:42 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:15:42 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:15:42 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:15:42 GMT+0200 (CEST)] [WAMPSERVER] ERROR - 	wamp.error.procedure_already_exists
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:15:49 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream closed...
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:18:04 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:18:36 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+Logger:fileTransport stream closed...
+Logger:fileTransport stream closed...
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+[Tue Jul 22 2014 14:19:55 GMT+0200 (CEST)] [REST] WARN - RestServer shutdown
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [WAMPSERVER] WARN - WampServer shutdown
+[Tue Jul 22 2014 14:20:30 GMT+0200 (CEST)] [REST] WARN - RestServer shutdown
+Logger:fileTransport stream opened...
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [WAMPSERVER] INFO - server is loading plugin [echoService]
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [REST] INFO - server is loading plugin [echo]
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [REST] INFO - 	echo service loaded
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [REST] INFO - server listen on port [9088]
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [WAMPSERVER] INFO - connection to application router established
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [WAMPSERVER] INFO - 	[bb:echo] registered successfully
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [WAMPSERVER] WARN - WampServer shutdown
+[Tue Jul 22 2014 14:20:41 GMT+0200 (CEST)] [REST] WARN - RestServer shutdown
+Logger:fileTransport stream closed...
