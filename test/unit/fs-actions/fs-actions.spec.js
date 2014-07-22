@@ -6,16 +6,18 @@ chai.use(spies);
 var expect = chai.expect
     , _ = require('lodash')
     , fs = require('fs')
+    , Logger = require('../../../modules/logger')
     , FsActions = require('../../../modules/fs-actions');
 
 describe('FsActions', function() {
     var fsActions = null;
 
+    var logger = new Logger.Logger().use(Logger.Transports.eyes());
+
     it('should creates a new instance', function() {
         fsActions = new FsActions();
         expect(fsActions).to.be.an.instanceof(FsActions);
         expect(fsActions.config().get('fsDelimiter')).to.be.equal('/');
-        expect(fsActions.config().get('debug')).to.be.equal(false);
     });
 
     it('should creates a new directory', function() {
@@ -51,5 +53,12 @@ describe('FsActions', function() {
 
         fsActions.removeDir(dir);
         expect(fs.existsSync(dir)).to.be.false;
+    });
+
+    it('should find subdirectories', function() {
+        var dir = '../';
+
+        var dirs = fsActions.findSubDirs(dir);
+        expect(dir.length).to.be.above(1);
     });
 });

@@ -1,23 +1,22 @@
-var expect = require('chai').expect
-    , colors = require('colors')
-    , Console = require('console')
+var _ = require('lodash')
+    , expect = require('chai').expect
     , fs = require('fs')
-    , Logger = require('../../../modules/logger');
+    , printf = require('util').format
+    , log = require('../../../modules/logger');
 
 describe('Logger', function() {
     var logger = null;
 
     it('should instanciates', function() {
-        logger = new Logger();
-        expect(logger).to.be.an.instanceof(Logger);
-        colors.setTheme(logger.config().get('theme'));
+        logger = new log.Logger();
+        expect(logger).to.be.an.instanceof(log.Logger);
     });
 
     it('should logs a message to a logfile', function(done) {
         this.timeout(5000);
 
         var filename = __dirname + '/test.log';
-        logger.use(logger.transports.file({
+        logger.use(log.Transports.logfile({
             logfile: filename,
             autoClose: 0
         }));
@@ -30,12 +29,36 @@ describe('Logger', function() {
         }, 2000);
     });
 
-    it('should handles custom transport', function() {
-        logger.transports = [];
+    it('should logs a message to stdout', function() {
+        var logs = []
+            , message = 'testlog';
 
-        function customTransport(obj) {
-            expect(obj.level).to.be.equal('error');
-            expect(obj.message).to.be.equal('dlc');
+        var unhook = log.hookStdout(function(string) {
+            logs.push(string);
+        });
+
+        logger.used = [];
+        logger.use(log.Transports.console());
+        logger.info(message);
+        expect(logs[0]).to.match(/testlog/);
+
+        unhook();
+    });
+
+    it('should handles custom transport', function() {
+        logger.used = [];
+
+        function customTransport() {
+            var args = _.toArray(arguments);
+
+            var time = new Date(args.shift())
+                , name = args.shift()
+                , level = args.shift();
+
+            expect(time).to.be.an.instanceof(Date);
+            expect(name).to.be.equal('LOGGER');
+            expect(level).to.be.equal('error');
+            expect(printf.apply(null, args)).to.be.equal('dlc');
         }
 
         logger.use(customTransport);

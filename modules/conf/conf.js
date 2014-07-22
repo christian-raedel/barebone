@@ -173,10 +173,6 @@ Conf.prototype._validate = function(conf) {
         conf = this.conf;
     }
 
-    if (_.isEmpty(conf)) {
-        throw new Error('configuration "' + this.name + '" is empty!');
-    }
-
     _.forEach(this.keys, function(key) {
         if (_.isUndefined(conf[key])) {
             if (_.isUndefined(this.def[key])) {

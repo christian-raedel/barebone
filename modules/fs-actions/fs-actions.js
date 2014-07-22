@@ -6,13 +6,17 @@ var _ = require('lodash')
 module.exports = FsActions;
 
 function FsActions(config) {
-    this.config(config);
+    var conf = this.config(config);
+
+    this.conf = conf
 
     return this;
 }
 
 FsActions.prototype.config = function(config) {
-    var def = {debug: false, fsDelimiter: path.sep};
+    var def = {
+        fsDelimiter: path.sep
+    };
 
     if (!config) {
         if (this.conf instanceof Conf) {
@@ -22,7 +26,10 @@ FsActions.prototype.config = function(config) {
         config = def;
     }
 
-    var conf = new Conf('FsActions', ['debug', 'fsDelimiter']).defaults(def);
+    var conf = new Conf('FsActions', [
+        'fsDelimiter'
+    ])
+    .defaults(def);
 
     this.conf = conf.load(config);
     return conf;
@@ -90,6 +97,16 @@ FsActions.prototype.removeDir = function(dir) {
     return this;
 };
 
+/***
+ * executes a function for every file in a provided directory
+ *
+ * @param: dir [String] - directory to search in
+ * @param: filter [String|RegExp] - filter filenames by this expression
+ * @param: fn [Function|Array[Function]] - function(s) to execute
+ * @param: context [*] - context for the function(s) to run in
+ *
+ * @return: [fsActions]
+ ***/
 FsActions.prototype.readDirAndExecuteSync = function(dir, filter, fn, context) {
     if (!_.isString(dir)) {
         throw new Error('invalid arguments to reading directory!');
@@ -141,4 +158,29 @@ FsActions.prototype._makePathsArray = function(dir) {
         return dir.length === 0 ? false : true;
     })
     .value();
+};
+
+FsActions.prototype.findSubDirs = function(dir) {
+    var del = this.conf.get('fsDelimiter');
+
+    dir = path.resolve(__dirname, dir);
+    if (dir[dir.length - 1] !== del) {
+        dir += del;
+    }
+
+    var files = [];
+    _.forEach(fs.readdirSync(dir), function(node) {
+        try {
+            node = dir + node;
+            var stats = fs.statSync(node);
+            if (stats.isDirectory()) {
+                files.push(node);
+                files = files.concat(this.findSubDirs(node));
+            }
+        } catch (err) {
+            console.log('cannot read directory "%s". [%s]', node, err.message);
+        }
+    }, this);
+
+    return files;
 };

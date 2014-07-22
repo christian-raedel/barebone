@@ -3,6 +3,7 @@ var _ = require('lodash')
     , path = require('path')
     , q = require('q')
     , FsActions = require('../fs-actions')
+    , Logger = require('../logger')
     , Conf = require('../conf');
 
 module.exports = RestServer;
@@ -27,7 +28,8 @@ RestServer.prototype.config = function(config) {
     var def = {
         port: 3000,
         plugins: __dirname + '/plugins',
-        basePath: '/api/'
+        basePath: '/api/',
+        logfile: '/../../logs/rest-server.log'
     };
 
     if (!config) {
@@ -41,11 +43,18 @@ RestServer.prototype.config = function(config) {
     var conf = new Conf('RestServer', [
         'port',
         'plugins',
-        'basePath'
+        'basePath',
+        'logfile'
     ])
     .defaults(def);
 
     this.conf = conf.load(config);
+
+    var logger = new Logger();
+    logger.use(logger.transports.file(conf.get('logfile')));
+    logger.use(logger.transports.console());
+    this.logger = logger;
+
     return conf;
 };
 

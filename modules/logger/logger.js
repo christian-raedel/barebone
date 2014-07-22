@@ -1,10 +1,13 @@
 var _ = require('lodash')
     , printf = require('util').format
     , fs = require('fs')
+    , console = require('console')
     , colors = require('colors')
+    , FsActions = require('../fs-actions')
+    , fsActions = new FsActions()
     , Conf = require('../conf');
 
-module.exports = Logger;
+module.exports.Logger = Logger;
 
 function Logger(config) {
     var conf = this.config(config);
@@ -16,12 +19,8 @@ function Logger(config) {
 
 Logger.prototype.config = function(config) {
     var def = {
-        theme: {
-            info: 'green',
-            warn: 'yellow',
-            debug: 'grey',
-            error: 'redBG'
-        }
+        name: 'LOGGER',
+        plugins: __dirname + '/transports'
     };
 
     if (!config) {
@@ -33,13 +32,10 @@ Logger.prototype.config = function(config) {
     }
 
     var conf = new Conf('Logger', [
-        'theme'
+        'name',
+        'plugins'
     ])
     .defaults(def);
-
-    conf.on('onValueChanged:theme', function(args) {
-        colors.setTheme(args.newValue);
-    });
 
     this.conf = conf.load(config);
     return conf;
@@ -51,112 +47,87 @@ Logger.prototype.use = function(fn) {
     }
 
     var transports = this.used || [];
-
     transports.push(fn);
-
     this.used = transports;
     return this;
 };
 
-Logger.prototype.transports = {
-    file: function(logfile) {
-        var conf = new Conf('transport:file', ['logfile', 'autoClose'])
-        .defaults({autoClose: 60 * 1000});
-
-        if (_.isPlainObject(logfile)) {
-            conf = conf.load(logfile);
-        }
-
-        if (_.isString(logfile)) {
-            conf.set('logfile', logfile);
-        }
-
-        var stream = null
-            , timeout = null;
-
-        return function(obj) {
-            var message = printf.apply(null, _.flatten([
-                '[%s] %s - %s\n',
-                new Date(obj.timestamp),
-                obj.level,
-                obj.message
-            ]));
-
-            var logfile = conf.get('logfile');
-
-            if (!stream) {
-                stream = fs.createWriteStream(logfile, {
-                    encoding: 'utf8',
-                    mode: 0600,
-                    flags: 'a'
-                });
-                stream.write('Logger:fileTransport stream opened...\n');
-            } else if (timeout) {
-                cancelTimeout(timeout);
-            }
-
-            stream.write(message);
-
-            timeout = setTimeout(function() {
-                stream.end('Logger:fileTransport stream closed...\n');
-                stream = null;
-            }, conf.get('autoClose'));
-        };
-    },
-    console: function(config) {
-        var conf = new Conf('transport:console', ['theme'])
-        .defaults({
-            theme: {
-                info: 'green',
-                warn: 'yellow',
-                debug: 'grey',
-                error: 'redBG'
-            }
-        });
-
-        if (_.isPlainObject(config)) {
-            conf.load(config);
-        }
-
-        conf.on('onValueChanged:theme', function(args) {
-            colors.setTheme(args.newValue);
-        });
-
-        return function(obj) {
-            var message = printf.apply(null, _.flatten([
-                '[%s] %s - %s\n',
-                new Date(obj.timestamp),
-                obj.level[obj.level],
-                obj.message
-            ]));
-
-            console.log(message);
-        };
-    }
-};
-
 Logger.prototype.log = function(level, message) {
-    var args = _.toArray(arguments).slice(2)
-        , logfile = this.logfile;
+    var args = _.toArray(arguments);
 
-    var obj = {
-        timestamp: new Date().getTime(),
-        level: level,
-        message: printf.apply(null, _.flatten([message, args]))
-    };
+    args.unshift(this.conf.get('name'));
+    args.unshift(new Date().getTime());
 
     transports = this.used || [];
     _.forEach(transports, function(transport) {
-        transport.apply(this, [obj]);
+        transport.apply(this, args);
     }, this);
 
     return this;
 };
 
+Logger.prototype.info = function() {
+    var args = _.toArray(arguments);
+    args.unshift('info');
+    return this.log.apply(this, args);
+};
+
+Logger.prototype.warn = function(message) {
+    var args = _.toArray(arguments);
+    args.unshift('warn');
+    return this.log.apply(this, args);
+};
+
+Logger.prototype.debug = function(message) {
+    var args = _.toArray(arguments);
+    args.unshift('debug');
+    return this.log.apply(this, args);
+};
+
 Logger.prototype.error = function(message) {
-    var args = _.toArray(arguments).slice(1);
+    var args = _.toArray(arguments);
+    args.unshift('error');
+    return this.log.apply(this, args);
+};
 
-    this.log.apply(null, _.flatten(['error', message, args]));
+module.exports.Transports = loadTransports(__dirname + '/transports');
 
-    return this;
+function loadTransports(pluginsdir) {
+    var transports = {};
+
+    function load(filename) {
+        var module = require(filename);
+
+        _.forOwn(module, function(transport, name) {
+            transports[name] = transport;
+        });
+    }
+
+    fsActions.readDirAndExecuteSync(pluginsdir, new RegExp('.*\.js$'), load, this);
+
+    return transports;
+};
+
+/***
+ * example: to hook stdout, call "var unhookStream = _hookStream(process.stdout, function(string, encoding, fd) {});"
+ *          to unhook stdout, call "unhookStream();"
+ ***/
+module.exports._hookStream = _hookStream;
+
+function _hookStream(stream, fn) {
+    if (!_.isFunction(fn)) {
+        throw new Error('invalid function to hook a stream!');
+    }
+
+    var oldWrite = stream.write;
+
+    stream.write = fn;
+
+    return function() {
+        stream.write = oldWrite;
+    };
+};
+
+module.exports.hookStdout = function(fn) {
+    return _hookStream(process.stdout, fn);
 };
