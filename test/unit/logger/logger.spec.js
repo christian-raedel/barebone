@@ -64,4 +64,21 @@ describe('Logger', function() {
         logger.use(customTransport);
         logger.error('%sl%s', 'd', 'c');
     });
+
+    it('should install and uses console hook', function() {
+        var testdata = 'teststring%d'
+            , size = 43
+            , logs = [];
+        log.installHookTo(console);
+        console.hook('log', function() {
+            var args = _.toArray(arguments);
+            logs.push(printf.apply(null, args));
+        });
+
+        logger.used = [];
+        logger.use(log.Transports.console());
+        logger.info(testdata, size);
+        console.unhook('log');
+        expect(logs[0]).to.match(/teststring43/);
+    });
 });
