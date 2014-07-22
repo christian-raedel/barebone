@@ -152,6 +152,19 @@
                         spawn: false,
                     }
                 },
+                barebone: {
+                    files: [
+                        'Gruntfile.js',
+                        'server.js',
+                        '*.json',
+                        'config/**/*',
+                        'modules/**/*.js'
+                    ],
+                    tasks: ['barebone'],
+                    options: {
+                        spawn: false,
+                    }
+                },
                 client: {
                     files: ['Gruntfile.js', 'index.html', 'app/**/*'],
                     tasks: ['test'],
@@ -196,11 +209,15 @@
             }
         });
 
+        grunt.registerTask('server', function() {
+            var server = require('./server');
+        });
         grunt.registerTask('preTest', ['clean', 'ngtemplates', 'concat', 'less']);
         grunt.registerTask('postTest', ['copy:source', 'copy:general', 'notify']);
         grunt.registerTask('test', ['preTest', 'karma', 'postTest', 'watch:test']);
         grunt.registerTask('default', ['preTest', 'postTest', 'watch:default']);
         grunt.registerTask('node', ['mochaTest', 'watch:node']);
+        grunt.registerTask('barebone', ['server', 'watch:barebone']);
         grunt.registerTask('travis', ['mochaTest:unit']);
     };
 }());

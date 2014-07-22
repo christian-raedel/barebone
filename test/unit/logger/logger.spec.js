@@ -69,7 +69,7 @@ describe('Logger', function() {
         var testdata = 'teststring%d'
             , size = 43
             , logs = [];
-        log.installHookTo(console);
+        var uninstallHook = log.installHookTo(console);
         console.hook('log', function() {
             var args = _.toArray(arguments);
             logs.push(printf.apply(null, args));
@@ -79,6 +79,7 @@ describe('Logger', function() {
         logger.use(log.Transports.console());
         logger.info(testdata, size);
         console.unhook('log');
+        uninstallHook();
         expect(logs[0]).to.match(/teststring43/);
     });
 });

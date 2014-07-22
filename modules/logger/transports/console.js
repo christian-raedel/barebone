@@ -1,7 +1,8 @@
 var _ = require('lodash')
     , printf = require('util').format
     , colors = require('colors')
-    , Conf = require('../../conf');
+    , Conf = require('../../conf')
+    , installHookTo = require('../hooks').installHookTo;
 
 module.exports.console = function(config) {
     config = config || {};

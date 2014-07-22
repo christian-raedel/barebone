@@ -4,6 +4,8 @@ var _ = require('lodash')
     , fs = require('fs')
     , path = require('path')
     , FsActions = require('../fs-actions')
+    , fsActions = new FsActions()
+    , logging = require('../logger')
     , Conf = require('../conf');
 
 module.exports = WampServer;
@@ -18,23 +20,25 @@ function WampServer(config) {
         use_deferred: q.defer
     });
 
+    var logger = new logging.Logger({name: 'WAMPSERVER'}).use(logging.Transports.console());
+
     conn.onopen = function(session) {
-        console.log('connection to application router established');
+        logger.info('connection to application router established');
         session.prefix(conf.get('curie'), conf.get('domain'));
         defer.resolve(session);
     };
 
     conn.onclose = function(reason, details) {
-        console.log('connection to application router closed', reason, details);
+        logger.warn('connection to application router closed', reason, details);
         if (reason === 'unreachable') {
             defer.reject(reason);
         }
     };
 
-    this.fsActions = new FsActions();
     this.conf = conf;
     this.conn = conn;
     this.session = defer.promise;
+    this.logger = logger;
 
     return this;
 }
@@ -78,12 +82,12 @@ WampServer.prototype.shutdown = function(timeout) {
 
         /*
         conn.onclose = function(reason, details) {
-            console.log('WampServer shutdown');
+            this.logger.info('WampServer shutdown');
             defer.resolve(reason);
         };
         */
         conn.close();
-        console.log('WampServer shutdown');
+        this.logger.info('WampServer shutdown');
         defer.resolve(true);
 
         return defer.promise;
@@ -93,8 +97,7 @@ WampServer.prototype.shutdown = function(timeout) {
 };
 
 WampServer.prototype.loadPlugins = function() {
-    var session = this.session
-        , dir = this.conf.get('plugins') + '/';
+    var dir = this.conf.get('plugins');
 
     if (!fs.existsSync(dir)) {
         throw new Error('plugin directory "%s" does not exists!', dir);
@@ -102,12 +105,12 @@ WampServer.prototype.loadPlugins = function() {
 
     function load(filename) {
         _.forOwn(require(filename), function(fn) {
-            console.log('server is loading plugin [%s]', path.basename(filename, '.js'));
+            this.logger.info('server is loading plugin [%s]', path.basename(filename, '.js'));
             fn.apply(this);
         }, this);
     }
 
-    this.fsActions.readDirAndExecuteSync(dir, new RegExp('.*\.js$'), load, this);
+    fsActions.readDirAndExecuteSync(dir, new RegExp('.*\.js$'), load, this);
 
     return this;
 }

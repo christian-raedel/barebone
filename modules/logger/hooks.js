@@ -28,6 +28,7 @@ function installHookTo(obj) {
                 args.push(undefined);
             }
 
+            /*
             args.push(function() {
                 var args = arguments;
 
@@ -39,6 +40,7 @@ function installHookTo(obj) {
                     methodRef.apply(self, args);
                 }
             });
+            */
 
             fn.apply(self, args);
         };
@@ -57,4 +59,14 @@ function installHookTo(obj) {
     };
 
     obj.unhook.methods = {};
+
+    return function uninstallHookFrom() {
+        if (obj.hook) {
+            obj.hook = null;
+        }
+
+        if (obj.unhook) {
+            obj.unhook = null;
+        }
+    };
 };

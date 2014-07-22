@@ -40,6 +40,18 @@
             }
         }
         ]
+    },
+    {
+        "type": "guest",
+        "executable": "node",
+        "arguments": ["server.js"],
+        "options": {
+            "workdir": "..",
+            "watch": {
+                "directories": [".."],
+                "action": "restart"
+            }
+        }
     }
     ]
 }

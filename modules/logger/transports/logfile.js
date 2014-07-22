@@ -47,7 +47,7 @@ module.exports.logfile = function(logfile) {
             });
             stream.write('Logger:fileTransport stream opened...\n');
         } else if (timeout) {
-            cancelTimeout(timeout);
+            clearTimeout(timeout);
         }
 
         stream.write(message);
