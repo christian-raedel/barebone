@@ -35,7 +35,7 @@ wampServer.loadPlugins().connect()
 module.exports.restServer = restServer;
 var restServer = new barebone.RestServer({
     port: 9088,
-    baseUrl: '/api/v2',
+    basePath: '/api/v2',
     plugins: __dirname + '/modules/barebone/rest-api'
 });
 

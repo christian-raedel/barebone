@@ -1,5 +1,6 @@
 var expect = require('chai').expect
     , _ = require('lodash')
+    , http = require('http')
     , autobahn = require('autobahn');
 
 describe('Barebone', function() {
@@ -33,10 +34,29 @@ describe('Barebone', function() {
         conn.open();
     });
 
-    it('shuts down successfully', function(done) {
+    it('executes echo rest service', function(done) {
         this.timeout(5000);
 
-        server.shutdown(3000).then(function() {
+        var testdata = 'dlc+cld';
+
+        var req = http.request({hostname: '127.0.0.1', port: 9088, path: '/api/v2/echo/' + testdata}, function(res) {
+            res.setEncoding('utf8');
+            expect(res.statusCode).to.be.equal(200);
+
+            res.on('data', function(chunk) {
+                expect(chunk).to.be.equal(testdata);
+                done();
+            });
+        });
+
+        req.on('error', done);
+        req.end();
+    });
+
+    it('shuts down successfully', function(done) {
+        this.timeout(7000);
+
+        server.shutdown(6000).then(function() {
             done();
         })
         .catch(function(reason) {

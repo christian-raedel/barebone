@@ -5,6 +5,7 @@ module.exports.echo = function() {
 
     server.get(conf.get('basePath') + '/echo/:message', function(req, res, next) {
         res.write(req.params.message);
+        res.end();
     });
 
     logger.info('\techo service loaded');
